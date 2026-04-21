@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/cksdud1202a/wikipulse-lab.git # 사용자님의 깃허브 주소
     targetRevision: main                                     # 브랜치 이름 (main 브랜치를 감시)
-    path: apps                                              # 저장소 내의 'apps' 폴더를 바라봅니다.
+    path: gitops/argocd/apps                                # 저장소 내의 'gitops/argocd/apps' 폴더를 바라봅니다.
     directory:
       recurse: true    # 매우 중요! apps 폴더 안의 하위 폴더들까지 싹 다 뒤져서 설정을 찾으라는 뜻입니다.
 
