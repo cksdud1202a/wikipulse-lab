@@ -1,44 +1,47 @@
+# KafkaNodePool (카프카 노드 구성)
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
-  name: combined
-  namespace: kafka
+  name: combined          # 노드 풀의 이름
+  namespace: kafka        # 카프카 네임스페이스
   labels:
-    strimzi.io/cluster: wikipulse
+    strimzi.io/cluster: wikipulse # 'wikipulse'라는 이름의 카프카 클러스터에 소속됨
 spec:
-  replicas: 1
+  replicas: 1             # 노드 개수는 1개 (학습용이므로 가볍게)
   roles:
-    - controller
-    - broker
+    - controller          # KRaft 모드에서 관리자(제어) 역할
+    - broker              # 실제 데이터를 저장하고 주고받는 역할
+    # (원래는 분리하는 게 좋지만, 여기선 1대에 두 역할을 다 합쳤습니다 - combined)
   storage:
-    type: ephemeral
+    type: ephemeral       # 임시 저장소 (포드가 재시작되면 데이터가 사라짐, 테스트용 설정)
 ---
+# Kafka 클러스터 엔진 설정
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: wikipulse
+  name: wikipulse         # 클러스터 전체의 이름
   namespace: kafka
   annotations:
-    strimzi.io/node-pools: enabled
-    strimzi.io/kraft: enabled
+    strimzi.io/node-pools: enabled # 위에서 만든 NodePool 기능을 사용함
+    strimzi.io/kraft: enabled      # [중요] Zookeeper 없이 실행되는 KRaft 모드 활성화
 spec:
   kafka:
-    version: 3.9.0
-    metadataVersion: 3.9-IV0
-    listeners:
-      - name: plain
-        port: 9092
-        type: internal
-        tls: false
-    config:
+    version: 3.9.0        # 카프카 소프트웨어 버전
+    metadataVersion: 3.9-IV0 
+    listeners:            # 카프카에 접속하는 통로 설정
+      - name: plain       # 암호화되지 않은 일반 통로
+        port: 9092        # 기본 포트
+        type: internal    # 클러스터 내부에서만 접속 가능
+        tls: false        # 보안 연결(SSL/TLS) 사용 안 함
+    config:               # 카프카 상세 튜닝 (현재 1대뿐이므로 복제본 설정을 모두 1로 고정)
       offsets.topic.replication.factor: 1
       transaction.state.log.replication.factor: 1
       transaction.state.log.min.isr: 1
       default.replication.factor: 1
       min.insync.replicas: 1
-  entityOperator:
-    topicOperator: {}
-    userOperator: {}
+  entityOperator:         # 토픽과 사용자를 자동으로 관리해주는 관리 도구들
+    topicOperator: {}     # KafkaTopic 리소스를 감시해서 실제 토픽을 만들어줌
+    userOperator: {}      # 사용자를 관리해줌
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic

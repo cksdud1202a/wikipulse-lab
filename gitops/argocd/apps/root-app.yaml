@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: root-app      # 이 애플리케이션의 이름입니다. 관리자 페이지에 이 이름으로 뜹니다.
   namespace: argocd   # ArgoCD가 설치된 네임스페이스에 생성해야 합니다.
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  # 앱 삭제 시 K8s 리소스도 함께 정리
 spec:
   # 앱이 속할 프로젝트 (기본값인 default 사용)
   project: default
@@ -15,6 +17,7 @@ spec:
     path: gitops/argocd/apps                                # 저장소 내의 'gitops/argocd/apps' 폴더를 바라봅니다.
     directory:
       recurse: true    # 매우 중요! apps 폴더 안의 하위 폴더들까지 싹 다 뒤져서 설정을 찾으라는 뜻입니다.
+      include: "*.yaml"  # yaml 파일만 sync (README.md 등 다른 파일 무시)
 
   # [배포 대상 설정] 어디에 배포할 것인가?
   destination:
