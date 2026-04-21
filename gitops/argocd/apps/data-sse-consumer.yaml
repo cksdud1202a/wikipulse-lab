@@ -1,22 +1,23 @@
+# Wikipedia SSE Consumer Deployment를 배포하는 ArgoCD Application
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: data-sse-consumer
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io  # 앱 삭제 시 Deployment도 함께 정리
 spec:
   project: default
   source:
     repoURL: https://github.com/cksdud1202a/wikipulse-lab.git
     targetRevision: main
-    path: gitops/manifests/sse-consumer
+    path: gitops/manifests/sse-consumer  # Deployment yaml이 있는 폴더
   destination:
     server: https://kubernetes.default.svc
-    namespace: data
+    namespace: data  # 데이터 파이프라인 서비스들이 올라가는 네임스페이스
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: true      # GitHub에서 파일 삭제 시 클러스터에서도 삭제
+      selfHeal: true   # 클러스터 상태가 Git과 달라지면 자동 복구
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=true  # data 네임스페이스 없으면 자동 생성

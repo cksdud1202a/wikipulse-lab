@@ -1,27 +1,28 @@
-#Strimzi 오퍼레이터 Helm으로 설치
+# Strimzi Kafka 오퍼레이터를 Helm으로 설치하는 ArgoCD Application
+# Strimzi는 K8s에서 Kafka를 CRD(kind: Kafka, KafkaTopic 등)로 선언적으로 관리할 수 있게 해주는 오퍼레이터
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: platform-strimzi
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io  # 앱 삭제 시 Strimzi 오퍼레이터도 함께 정리
 spec:
   project: default
   source:
-    repoURL: https://strimzi.io/charts/
+    repoURL: https://strimzi.io/charts/        # Strimzi 공식 Helm 차트 레포
     chart: strimzi-kafka-operator
-    targetRevision: 0.45.0
+    targetRevision: 0.45.0                     # 설치할 Strimzi 버전
     helm:
       values: |
         watchNamespaces:
           - kafka  # kafka 네임스페이스만 감시 (watchAnyNamespace는 ClusterRole 권한 문제 발생)
   destination:
     server: https://kubernetes.default.svc
-    namespace: strimzi
+    namespace: strimzi  # Strimzi 오퍼레이터가 설치될 네임스페이스
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: true      # GitHub에서 파일 삭제 시 클러스터에서도 삭제
+      selfHeal: true   # 클러스터 상태가 Git과 달라지면 자동 복구
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=true  # strimzi 네임스페이스 없으면 자동 생성

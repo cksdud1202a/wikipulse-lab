@@ -1,10 +1,12 @@
+# Wikipedia SSE Consumer Pod을 실행하는 Deployment
+# SSE Consumer는 Wikipedia 실시간 편집 스트림을 받아 Kafka wiki-edits 토픽으로 발행
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sse-consumer
   namespace: data
 spec:
-  replicas: 1
+  replicas: 1  # SSE 스트림은 단일 연결이므로 1개로 충분
   selector:
     matchLabels:
       app: sse-consumer
@@ -19,11 +21,11 @@ spec:
           imagePullPolicy: Never  # kind 로컬 이미지 사용 (레지스트리에서 pull 안 함)
           env:
             - name: KAFKA_BOOTSTRAP
-              value: "wikipulse-kafka-bootstrap.kafka.svc:9092"
+              value: "wikipulse-kafka-bootstrap.kafka.svc:9092"  # K8s 내부 Kafka 서비스 주소
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 100m      # 최소 보장 CPU (0.1 코어)
+              memory: 128Mi  # 최소 보장 메모리
             limits:
-              cpu: 200m
-              memory: 256Mi
+              cpu: 200m      # 최대 사용 CPU (0.2 코어)
+              memory: 256Mi  # 최대 사용 메모리
