@@ -1,3 +1,4 @@
+---
 # Kafka 클러스터 + 토픽 7개를 배포하는 ArgoCD Application
 apiVersion: argoproj.io/v1alpha1
 kind: Application

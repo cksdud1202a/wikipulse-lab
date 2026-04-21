@@ -1,3 +1,4 @@
+---
 # Strimzi Kafka 오퍼레이터를 Helm으로 설치하는 ArgoCD Application
 # Strimzi는 K8s에서 Kafka를 CRD(kind: Kafka, KafkaTopic 등)로 선언적으로 관리할 수 있게 해주는 오퍼레이터
 apiVersion: argoproj.io/v1alpha1

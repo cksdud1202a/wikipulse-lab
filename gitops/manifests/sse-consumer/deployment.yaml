@@ -1,3 +1,4 @@
+---
 # Wikipedia SSE Consumer Pod을 실행하는 Deployment
 # SSE Consumer는 Wikipedia 실시간 편집 스트림을 받아 Kafka wiki-edits 토픽으로 발행
 apiVersion: apps/v1

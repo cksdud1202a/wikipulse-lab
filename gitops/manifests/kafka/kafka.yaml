@@ -1,3 +1,4 @@
+---
 # KafkaNodePool (카프카 노드 구성)
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool

@@ -1,3 +1,4 @@
+---
 # Wikipedia SSE Consumer Deployment를 배포하는 ArgoCD Application
 apiVersion: argoproj.io/v1alpha1
 kind: Application

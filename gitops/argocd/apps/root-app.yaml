@@ -1,3 +1,4 @@
+---
 # ArgoCD에서 사용하는 커스텀 리소스 정의 (ArgoCD 앱임을 명시)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
