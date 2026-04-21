@@ -4,7 +4,7 @@ import os
 import time
 
 import requests
-from kafka import KafkaProducer
+from confluent_kafka import Producer
 
 # 로그 형식 설정: 시간 + 레벨 + 메시지
 logging.basicConfig(
@@ -26,14 +26,15 @@ TOPIC = "wiki-edits"
 RECONNECT_DELAY = 5
 
 
+def delivery_report(err, msg):
+    """Kafka 전송 결과 콜백 — 실패 시 로그 출력."""
+    if err:
+        logger.error("Delivery failed: %s", err)
+
+
 def create_producer():
-    """Kafka 프로듀서 생성. 이벤트를 JSON 직렬화해서 전송."""
-    return KafkaProducer(
-        bootstrap_servers=KAFKA_BOOTSTRAP,
-        value_serializer=lambda v: json.dumps(v).encode("utf-8"),  # dict → JSON bytes
-        acks="all",   # 모든 replica가 받아야 성공으로 간주 (데이터 유실 방지)
-        retries=3,    # 전송 실패 시 최대 3번 재시도
-    )
+    """Kafka 프로듀서 생성."""
+    return Producer({"bootstrap.servers": KAFKA_BOOTSTRAP})
 
 
 def stream(producer):
@@ -41,7 +42,9 @@ def stream(producer):
     logger.info("Connecting to Wikipedia SSE stream...")
 
     # stream=True: 응답 본문을 한 번에 받지 않고 한 줄씩 스트리밍
-    response = requests.get(SSE_URL, stream=True, timeout=30)
+    # User-Agent 없으면 Wikimedia가 403으로 차단
+    headers = {"User-Agent": "wikipulse-sse-consumer/1.0 (https://github.com/cksdud1202a/wikipulse-lab)"}
+    response = requests.get(SSE_URL, stream=True, timeout=30, headers=headers)
     response.raise_for_status()  # 4xx/5xx 응답이면 예외 발생
     logger.info("Connected.")
 
@@ -63,7 +66,13 @@ def stream(producer):
             continue  # JSON 파싱 실패 시 해당 이벤트 스킵
 
         # Kafka wiki-edits 토픽에 이벤트 원본 전송
-        producer.send(TOPIC, value=event)
+        producer.produce(
+            TOPIC,
+            value=json.dumps(event).encode("utf-8"),
+            callback=delivery_report,
+        )
+        # 내부 큐에 쌓인 메시지 전송 처리 (non-blocking)
+        producer.poll(0)
         logger.debug("Sent: %s", event.get("title"))
 
 
