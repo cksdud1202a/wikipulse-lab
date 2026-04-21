@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/cksdud1202a/wikipulse-lab.git
     targetRevision: main
-    path: gitops/apps/kafka
+    path: gitops/manifests/kafka
   destination:
     server: https://kubernetes.default.svc
     namespace: kafka
