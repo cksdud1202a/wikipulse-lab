@@ -1,0 +1,31 @@
+---
+# Kafka UI — Kafka 클러스터 상태, 토픽, 메시지를 브라우저에서 확인하는 웹 UI
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-kafka-ui
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://provectustech.github.io/kafka-ui/  # Kafka UI 공식 Helm 차트
+    chart: kafka-ui
+    targetRevision: 0.7.6
+    helm:
+      values: |
+        yamlApplicationConfig:
+          kafka:
+            clusters:
+              - name: wikipulse
+                bootstrapServers: wikipulse-kafka-bootstrap.kafka.svc:9092
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
