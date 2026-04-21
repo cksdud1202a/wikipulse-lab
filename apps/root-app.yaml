@@ -1,22 +1,30 @@
+# ArgoCD에서 사용하는 커스텀 리소스 정의 (ArgoCD 앱임을 명시)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root-app
-  namespace: argocd
+  name: root-app      # 이 애플리케이션의 이름입니다. 관리자 페이지에 이 이름으로 뜹니다.
+  namespace: argocd   # ArgoCD가 설치된 네임스페이스에 생성해야 합니다.
 spec:
+  # 앱이 속할 프로젝트 (기본값인 default 사용)
   project: default
+
+  # [소스 설정] 어디에 있는 코드를 가져올 것인가?
   source:
-    repoURL: https://github.com/cksdud1202a/wikipulse-lab.git
-    targetRevision: main
-    path: apps
+    repoURL: https://github.com/cksdud1202a/wikipulse-lab.git # 사용자님의 깃허브 주소
+    targetRevision: main                                     # 브랜치 이름 (main 브랜치를 감시)
+    path: apps                                              # 저장소 내의 'apps' 폴더를 바라봅니다.
     directory:
-      recurse: true
+      recurse: true    # 매우 중요! apps 폴더 안의 하위 폴더들까지 싹 다 뒤져서 설정을 찾으라는 뜻입니다.
+
+  # [배포 대상 설정] 어디에 배포할 것인가?
   destination:
-    server: https://kubernetes.default.svc
-    namespace: argocd
+    server: https://kubernetes.default.svc # 현재 ArgoCD가 떠 있는 바로 그 쿠버네티스 클러스터
+    namespace: argocd                      # 기본적으로 설치될 네임스페이스
+
+  # [동기화 정책] 깃허브와 클러스터를 어떻게 맞출 것인가?
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    automated:         # 자동 동기화 활성화
+      prune: true      # 깃허브에서 파일을 지우면 쿠버네티스에서도 자동으로 지워라! (매우 깔끔)
+      selfHeal: true   # 누가 실수로 클러스터 파일을 직접 수정하면, 다시 깃허브 상태로 강제 복구해라!
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=true # 배포할 네임스페이스가 없으면 자동으로 만들어라!
