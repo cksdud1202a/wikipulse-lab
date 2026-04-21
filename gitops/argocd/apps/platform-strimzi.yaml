@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: platform-strimzi
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -12,7 +14,8 @@ spec:
     targetRevision: 0.45.0
     helm:
       values: |
-        watchAnyNamespace: true
+        watchNamespaces:
+          - kafka  # kafka 네임스페이스만 감시 (watchAnyNamespace는 ClusterRole 권한 문제 발생)
   destination:
     server: https://kubernetes.default.svc
     namespace: strimzi
