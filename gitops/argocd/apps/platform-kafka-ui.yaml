@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://ui.charts.kafka-ui.provectus.io  # Kafka UI 공식 Helm 차트 (이전된 주소)
+    repoURL: https://provectus.github.io/kafka-ui-charts  # Kafka UI 공식 Helm 차트
     chart: kafka-ui
     targetRevision: 0.7.6
     helm:
