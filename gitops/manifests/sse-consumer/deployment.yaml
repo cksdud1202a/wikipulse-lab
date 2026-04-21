@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sse-consumer
+  namespace: data
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sse-consumer
+  template:
+    metadata:
+      labels:
+        app: sse-consumer
+    spec:
+      containers:
+        - name: sse-consumer
+          image: sse-consumer:latest
+          imagePullPolicy: Never  # kind 로컬 이미지 사용 (레지스트리에서 pull 안 함)
+          env:
+            - name: KAFKA_BOOTSTRAP
+              value: "wikipulse-kafka-bootstrap.kafka.svc:9092"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
