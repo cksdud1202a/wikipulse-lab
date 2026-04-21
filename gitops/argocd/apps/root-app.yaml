@@ -28,3 +28,4 @@ spec:
       selfHeal: true   # 누가 실수로 클러스터 파일을 직접 수정하면, 다시 깃허브 상태로 강제 복구해라!
     syncOptions:
       - CreateNamespace=true # 배포할 네임스페이스가 없으면 자동으로 만들어라!
+      - ApplyOutOfSyncOnly=true # 변경된 리소스만 apply, 이미 최신인 건 건드리지 않음
