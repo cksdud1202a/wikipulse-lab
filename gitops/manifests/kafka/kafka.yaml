@@ -40,6 +40,7 @@ spec:
       transaction.state.log.min.isr: 1
       default.replication.factor: 1
       min.insync.replicas: 1
+      log.retention.hours: 1
   entityOperator:         # 토픽과 사용자를 자동으로 관리해주는 관리 도구들
     topicOperator: {}     # KafkaTopic 리소스를 감시해서 실제 토픽을 만들어줌
     userOperator: {}      # 사용자를 관리해줌
